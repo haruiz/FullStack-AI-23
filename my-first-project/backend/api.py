@@ -1,7 +1,11 @@
 from fastapi import FastAPI, Request
 import numpy as np
+from pydantic import BaseModel
 from model_loader import ModelLoader, Framework
 from fastapi.middleware.cors import CORSMiddleware
+from users_controller import router as users_router
+from iris_controller import router as iris_router
+
 
 app = FastAPI()
 
@@ -18,7 +22,6 @@ app.add_middleware(
 def load_model():
     """this function will run once when the application starts up"""
     print("Loading the model...")
-
     model = ModelLoader(
         path='models/tf/iris_model',
         framework=Framework.tensorflow,
@@ -28,25 +31,29 @@ def load_model():
     )
     print("Model loaded successfully!")
     app.state.model = model
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    """this function will run once when the application shuts down"""
+    print("Shutting down the application...")
   
 
-@app.get("/")
-def home():
-    return {"message": "Hello World from the API"}
+app.include_router(
+    users_router, 
+    tags=["users"], 
+    prefix="/users"
+)
 
+app.include_router(
+    iris_router, 
+    tags=["iris"],
+    prefix="/iris"
+)
 
-@app.post("/predict")
-async def predict(request: Request):
-
-    request_data_list = await request.json()
-    request_data = np.array([
-        list(X.values()) for X in request_data_list
-    ])
-    model = app.state.model
-    predictions = model.predict(request_data)
-
-    return {"predictions": predictions}
-
+@app.get("/hi")
+def hi():
+    return {"message": "Hello World from the API!"}
 
 
 
