@@ -34,7 +34,7 @@ class IrisController:
 
     @router.get("/hi")
     def hi(self):
-        return "hi from IrisController"
+        return "hi from iris controller running in docker, with reloading!"
     
     @router.post("/predict")
     def predict(self, rows: typing.List[IrisModelRow]):  
