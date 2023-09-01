@@ -1,6 +1,5 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import numpy as np
-from pydantic import BaseModel
 from model_loader import ModelLoader, Framework
 from fastapi.middleware.cors import CORSMiddleware
 from users_controller import router as users_router
@@ -53,7 +52,7 @@ app.include_router(
 
 @app.get("/hi")
 def hi():
-    return {"message": "Hello World from the API!"}
+    return {"message": "Hello World from the API!!!"}
 
 
 

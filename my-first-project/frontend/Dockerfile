@@ -2,7 +2,7 @@ FROM python:3.10 as build-stage
 WORKDIR /tmp
 RUN pip install poetry
 COPY ./pyproject.toml /tmp/
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --with tf_linux
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 FROM python:3.10-slim
 RUN apt-get update -y && apt-get install build-essential -y
@@ -13,9 +13,5 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN pwd 
 COPY  . .
 
-RUN pwd && ls -la
-
-EXPOSE 8080
-#CMD ["uvicorn", "--host", "0.0.0.0", "--reload", "--reload-dir", ".", "api:app", "--port", "8080"]
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
-
+EXPOSE 8501
+CMD ["streamlit", "run", "home.py", "--server.port", "8501"]

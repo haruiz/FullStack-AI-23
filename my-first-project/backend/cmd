@@ -1,5 +1,0 @@
-# create the docker image to run backend
-docker build -t iris_model_api 
-
-# run a container based on the iris_model_api image
-docker run -it --name iris -v .:/app  -p 8000:8000 iris_model_api 

@@ -1,0 +1,29 @@
+version: "3.9"
+networks:
+  project-net:
+    driver: bridge
+services:
+  frontend:
+    container_name: project-frontend
+    build: frontend
+    ports:
+      - 8501:8501
+    depends_on:
+      - backend
+    environment:
+      - API_ENDPOINT=http://backend:8080
+    volumes:
+      - ./frontend:/app
+    networks:
+      - project-net
+  backend:
+    container_name: project-backend
+    ports:
+      - 8080:8080
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+    networks:
+      - project-net

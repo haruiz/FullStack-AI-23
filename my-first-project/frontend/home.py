@@ -3,10 +3,11 @@ import pandas as pd
 import random
 import requests
 import json
+import os
 
-url = "http://localhost:8000/predict"
+API_ENDPOINT = os.environ.get("API_ENDPOINT", "https://localhost:8080")
 
-def call_api(sepal_length, sepal_width, petal_length, petal_width):
+def call_api_predict_method(sepal_length, sepal_width, petal_length, petal_width):
     request_data = [{
         "sepal_length": sepal_length,
         "sepal_width": sepal_width,
@@ -17,7 +18,8 @@ def call_api(sepal_length, sepal_width, petal_length, petal_width):
     headers = {
     'Content-Type': 'application/json'
     }
-    response = requests.request("POST", url, headers=headers, data=request_data_json)
+    predict_method_endpoint = f"{API_ENDPOINT}/iris/predict"
+    response = requests.request("POST",predict_method_endpoint , headers=headers, data=request_data_json)
     response_json = response.json()
     predictions = response_json['predictions']
     label = predictions[0]
@@ -41,7 +43,7 @@ def app():
 
     i_was_clicked = st.button("Predict")
     if i_was_clicked:
-        label = call_api(sepal_length, sepal_width, petal_length, petal_width)
+        label = call_api_predict_method(sepal_length, sepal_width, petal_length, petal_width)
         st.write(f'Predicted label: {label}')
         st.balloons()
 
