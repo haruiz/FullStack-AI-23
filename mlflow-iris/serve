@@ -1,0 +1,1 @@
+mlflow models serve --model-uri models:/iris-classifier-uao-mar4-23 -p 8081 --no-conda
