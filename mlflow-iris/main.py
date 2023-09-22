@@ -261,6 +261,14 @@ def rollback_model_version(registered_model_name, stage, version):
         stage=stage
     )
 
+def get_list_of_models():
+    """"
+    Obtain the list of models in the registry
+    """
+    client = MlflowClient()
+    for rm in client.search_registered_models():
+        print(rm.name)
+
 
 def call_model_at_stage(registered_model_name, stage, data):
     """
@@ -276,6 +284,36 @@ def call_model_at_stage(registered_model_name, stage, data):
     # Evaluate the model
     predictions = model.predict(data)
     return predictions
+
+def move_model_to_production_form_runname(experiment_id, run_name, model_name):
+    """
+    Move the model to production from the run name
+    :param model_name:
+    :param stage:
+    :return:
+    """
+    client = MlflowClient()
+    # Get the run ID from the run name
+    found_run = None
+    for run in client.search_runs(experiment_id):
+        if run.info.run_name == run_name:
+            found_run = run
+            break
+
+    if found_run is None:
+        raise Exception(f"Run {run_name} not found")
+    
+    model_uri = f"runs:/{found_run.info.run_id}/{found_run.data.params['model_name']}"
+    try:
+        model = client.get_registered_model(model_name)
+        if model is not None:
+            print(f"Model {model_name} already exists")
+    except:
+        model = mlflow.register_model(model_uri, model_name)
+    return model
+
+        
+
 
 
 def list_experiments_artifacts(experiment_id):
@@ -345,6 +383,8 @@ def get_best_model_uri(experiment_id, metric):
     return model_uri
 
 
+
+
 if __name__ == '__main__':
     #mlflow.set_tracking_uri("http://myserver.com/mlflow:5000")
     parser = argparse.ArgumentParser()
@@ -356,7 +396,10 @@ if __name__ == '__main__':
     experiment_name = f"Iris Classifier"
     experiment_id = create_experiment(experiment_name)
 
-    #run_experiment(experiment_id, n_splits=args.nsplits)
+    # move_model_to_production_form_runname(experiment_id, run_name="LDA-20230908-200035", model_name= "modelo-iris")
+    # promote_model_to_stage("modelo-iris", "Production")
+
+    run_experiment(experiment_id, n_splits=args.nsplits)
 
 
     # list_experiment_models(experiment_id)
